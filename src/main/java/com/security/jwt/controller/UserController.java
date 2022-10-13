@@ -77,7 +77,12 @@ public class UserController {
                     Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
                     JWTVerifier verifier=JWT.require(algorithm).build();
                     DecodedJWT decodedJWT = verifier.verify(refresh_token);
+                    
                     String username=decodedJWT.getSubject();
+                    String isRefreshToken=decodedJWT.getClaim("refreshToken").as(String.class);
+                    if(!Boolean.parseBoolean(isRefreshToken)){
+                        throw new RuntimeException("Forbbiden revalidate token with normal token");
+                    }
                     User user=userService.getUser(username);
                     String access_token = JWT.create()
                         .withSubject(user.getUsername())

@@ -51,6 +51,11 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter{
                     JWTVerifier verifier=JWT.require(algorithm).build();
                     DecodedJWT decodedJWT = verifier.verify(token);
                     String username=decodedJWT.getSubject();
+                    String isRefreshToken=decodedJWT.getClaim("refreshToken").as(String.class);
+                    if(Boolean.parseBoolean(isRefreshToken)){
+                        throw new RuntimeException("Forbbiden access with refresh token");
+                    }
+                    
                     String[] roles= decodedJWT.getClaim("roles").asArray(String.class);
                     Collection<SimpleGrantedAuthority> authorities=new ArrayList<>();
                     
